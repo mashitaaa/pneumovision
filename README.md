@@ -10,7 +10,7 @@ pinned: false
 license: mit
 ---
 
-# 🫁 Pneumonia Detection dari Chest X-Ray
+# 🫁 PneumoVision+: Platform Klasifikasi Otomatis Pneumonia pada Citra Chest X-Ray Berbasis Kecerdasan Buatan Menggunakan EfficientNetB0 
 
 Aplikasi klasifikasi gambar medis untuk mendeteksi pneumonia dari foto X-Ray dada menggunakan **Transfer Learning (EfficientNetB0)**.
 
