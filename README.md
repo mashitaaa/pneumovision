@@ -38,7 +38,3 @@ Aplikasi klasifikasi gambar medis untuk mendeteksi pneumonia dari foto X-Ray dad
 - **Custom head:** GlobalAveragePooling → Dense(256) → Dropout(0.4) → Dense(64) → Sigmoid
 - **Training:** 2 phase — frozen base → fine-tuning 30 layer terakhir
 - **Augmentasi:** rotation, zoom, flip, shift
-
-## ⚠️ Disclaimer
-
-Aplikasi ini hanya untuk tujuan **edukasi dan penelitian**. Bukan pengganti diagnosis dokter profesional.
