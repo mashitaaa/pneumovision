@@ -7,44 +7,34 @@ import gradio as gr
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
-# ── Model & Configuration ───────────────────────────────────────────────────
-# Pastikan kamu sudah mengganti nama file di bawah ini jika memakai best_model.keras
-MODEL_NAME = "best_model.keras" 
+MODEL_NAME = "best_model.keras"
 
 if os.path.exists(MODEL_NAME):
     model = tf.keras.models.load_model(MODEL_NAME)
 else:
-    # Fallback jika kamu masih pakai nama file lama
     model = tf.keras.models.load_model("pneumonia_model.keras")
 
 with open("label_map.json") as f:
-    label_map = json.load(f)  # {"0": "NORMAL", "1": "PNEUMONIA"}
+    label_map = json.load(f)
 
 IMG_SIZE = (224, 224)
 
-
-# ── Inference Engine (Kunci Sinkronisasi Total dengan Kaggle) ────────────────
 def predict(image):
     if image is None:
         return None, "<div style='color: #94A3B8; padding-top: 10px; font-size: 0.95rem;'>Unggah foto rontgen dada untuk memuat ringkasan analisis.</div>"
 
-    # 1. Simpan gambar PIL temporer ke disk agar bisa dibaca murni oleh load_img Keras
     temp_path = "temp_hf_input.jpg"
     image.convert("RGB").save(temp_path, "JPEG")
-    
-    # 2. Load gambar murni menggunakan fungsi Keras (Sama persis dengan skrip test Kaggle!)
+
     img_keras = load_img(temp_path, target_size=IMG_SIZE)
     img_arr = img_to_array(img_keras)
-    
-    # Hapus file temp setelah selesai dibaca biar hemat memori
+
     if os.path.exists(temp_path):
         os.remove(temp_path)
-    
-    # 3. Jalankan Preprocessing bawaan EfficientNet
+
     img_preprocessed = preprocess_input(img_arr.copy())
     img_batch = np.expand_dims(img_preprocessed, axis=0)
 
-    # 4. Ambil nilai probabilitas biner sigmoid
     prob = float(model.predict(img_batch, verbose=0)[0][0])
 
     results = {
@@ -72,8 +62,6 @@ def predict(image):
 
     return results, verdict
 
-
-# ── Minimalist Radiology Dark UI ────────────────────────────────────────────
 with gr.Blocks(
     title="Pneumonia Detection System",
     theme=gr.themes.Soft(
@@ -87,25 +75,25 @@ with gr.Blocks(
     .header-box { border-bottom: 1px solid #334155; padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
     .header-box h1 { font-size: 1.75rem; font-weight: 700; color: #F8FAFC !important; margin-bottom: 0.25rem; }
     .header-box p { color: #94A3B8 !important; font-size: 0.95rem; }
-    
-    .block, .gr-group, .gr-box, .gr-form, .gr-card { 
-        border: none !important; 
-        background: transparent !important; 
-        box-shadow: none !important; 
-        padding: 0 !important; 
+
+    .block, .gr-group, .gr-box, .gr-form, .gr-card {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
     }
-    
+
     .section-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #38BDF8 !important; margin-bottom: 1rem; }
     .meta-text, .output-class, .confidence { color: #E2E8F0 !important; font-weight: 500 !important; }
-    
-    .bar { 
-        background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%) !important; 
+
+    .bar {
+        background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%) !important;
         border-radius: 4px !important;
     }
-    
+
     button.primary { background-color: #2563EB !important; border: none !important; color: white !important; }
     button.primary:hover { background-color: #1D4ED8 !important; }
-    
+
     .footer-box { text-align: center; color: #64748B; font-size: 0.8rem; margin-top: 5rem; border-top: 1px solid #334155; padding-top: 1.5rem; }
     footer { display: none !important; }
     """,
@@ -121,12 +109,14 @@ with gr.Blocks(
 
             with gr.Column(scale=5):
                 gr.Markdown("### Input Citra Rontgen", elem_classes=["section-title"])
+
                 image_input = gr.Image(
                     type="pil",
                     label="Chest X-Ray (AP/PA)",
                     height=310,
                     show_label=False,
                 )
+
                 submit_btn = gr.Button(
                     "Jalankan Analisis",
                     variant="primary",
@@ -135,7 +125,7 @@ with gr.Blocks(
 
             with gr.Column(scale=5):
                 gr.Markdown("### Hasil Analisis", elem_classes=["section-title"])
-                
+
                 label_output = gr.Label(
                     label="Nilai Kepercayaan Kelas",
                     show_label=False,
